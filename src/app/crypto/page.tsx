@@ -194,6 +194,7 @@ export default function CryptoPage() {
   // Cryptanalysis
   const [crackInput, setCrackInput] = useState("");
   const [crackResults, setCrackResults] = useState<{ shift: number; chiSq: number; plaintext: string }[] | null>(null);
+  const [showAllShifts, setShowAllShifts] = useState(false);
 
   // Diffie-Hellman
   const [dhResult, setDhResult] = useState<{ a: number; b: number; A: bigint; B: bigint; shared: bigint } | null>(null);
@@ -209,9 +210,10 @@ export default function CryptoPage() {
   }
 
   function handleCipherEncrypt() {
-    if (cipherType === "caesar") setCipherResult(caesarEncrypt(cipherText, parseInt(cipherKey) || 0));
-    else if (cipherType === "vigenere") setCipherResult(vigenereEncrypt(cipherText, cipherKey));
-    else if (cipherType === "xor") setCipherResult(xorEncryptHex(cipherText, cipherKey));
+    let result: string;
+    if (cipherType === "caesar") result = caesarEncrypt(cipherText, parseInt(cipherKey) || 0);
+    else if (cipherType === "vigenere") result = vigenereEncrypt(cipherText, cipherKey);
+    else if (cipherType === "xor") result = xorEncryptHex(cipherText, cipherKey);
     else {
       const rails = parseInt(cipherKey) || 3;
       const clean = cipherText.replace(/\s/g, "");
@@ -224,18 +226,21 @@ export default function CryptoPage() {
         else if (rail === rails - 1) dir = -1;
         rail += dir;
       }
-      setCipherResult(fence.map((r) => r.join("")).join(""));
+      result = fence.map((r) => r.join("")).join("");
     }
+    setCipherResult(result);
+    setCipherText(result); // so clicking Decrypt next operates on this ciphertext, not the old plaintext
   }
 
   function handleCipherDecrypt() {
-    if (cipherType === "caesar") setCipherResult(caesarDecrypt(cipherText, parseInt(cipherKey) || 0));
-    else if (cipherType === "vigenere") setCipherResult(vigenereDecrypt(cipherText, cipherKey));
+    let result: string;
+    if (cipherType === "caesar") result = caesarDecrypt(cipherText, parseInt(cipherKey) || 0);
+    else if (cipherType === "vigenere") result = vigenereDecrypt(cipherText, cipherKey);
     else if (cipherType === "xor") {
       try {
-        setCipherResult(xorDecryptHex(cipherText.trim(), cipherKey));
+        result = xorDecryptHex(cipherText.trim(), cipherKey);
       } catch {
-        setCipherResult("Input must be hex ciphertext.");
+        result = "Input must be hex ciphertext.";
       }
     } else {
       const rails = parseInt(cipherKey) || 3;
@@ -258,13 +263,15 @@ export default function CryptoPage() {
         pos += railCounts[r];
       }
       const railIdx = new Array(rails).fill(0);
-      let result = "";
+      let out = "";
       for (const r of pattern) {
-        result += railChars[r][railIdx[r]];
+        out += railChars[r][railIdx[r]];
         railIdx[r]++;
       }
-      setCipherResult(result);
+      result = out;
     }
+    setCipherResult(result);
+    setCipherText(result); // same reasoning: keeps Text field in sync with whatever's currently "active"
   }
 
   function handleCrack() {
@@ -347,16 +354,24 @@ export default function CryptoPage() {
         </button>
       </div>
       {cipherResult && (
-        <div style={{ background: "#f5f5f5", padding: 12, borderRadius: 6, marginTop: 8, wordBreak: "break-all", fontFamily: "monospace", fontSize: 13 }}>
-          {cipherResult}
-        </div>
+        <>
+          <p style={{ fontSize: 12, color: "#666", marginTop: 8, marginBottom: 4 }}>
+            Result (also copied into the Text field above — click Decrypt now to round-trip it back):
+          </p>
+          <div style={{ background: "#f5f5f5", padding: 12, borderRadius: 6, wordBreak: "break-all", fontFamily: "monospace", fontSize: 13 }}>
+            {cipherResult}
+          </div>
+        </>
       )}
 
       <h2 style={{ marginTop: 32 }}>Cryptanalysis &mdash; Frequency Analysis</h2>
       <p style={{ fontSize: 13, color: "#666" }}>Paste Caesar-ciphertext (no key needed) &mdash; cracks it via letter-frequency scoring.</p>
       <textarea value={crackInput} onChange={(e) => setCrackInput(e.target.value)} rows={2} style={{ display: "block", width: "100%", padding: 8, marginBottom: 8 }} />
       <button onClick={handleCrack} style={{ padding: "8px 16px" }}>
-        Crack
+        Crack (Top 3 by Frequency Analysis)
+      </button>
+      <button onClick={() => setShowAllShifts((v) => !v)} style={{ padding: "8px 16px", marginLeft: 8 }}>
+        {showAllShifts ? "Hide All 26 Shifts" : "Show All 26 Shifts (Brute Force)"}
       </button>
       {crackResults && (
         <div style={{ marginTop: 8 }}>
@@ -370,6 +385,22 @@ export default function CryptoPage() {
               #{i + 1} shift {r.shift} (chi-sq {r.chiSq.toFixed(2)}): {r.plaintext}
             </div>
           ))}
+        </div>
+      )}
+      {showAllShifts && crackInput && (
+        <div style={{ marginTop: 12 }}>
+          <p style={{ fontSize: 12, color: "#666" }}>
+            Every possible shift, no scoring or guessing &mdash; with only 26 possibilities, brute force alone is a
+            complete attack. Just read down the list for whichever line looks like real text.
+          </p>
+          <div style={{ maxHeight: 400, overflowY: "auto", border: "1px solid #ddd", borderRadius: 6 }}>
+            {Array.from({ length: 26 }, (_, shift) => (
+              <div key={shift} style={{ display: "flex", gap: 8, padding: "6px 10px", borderBottom: "1px solid #eee", fontSize: 13, fontFamily: "monospace" }}>
+                <span style={{ color: "#999", minWidth: 28 }}>{shift}</span>
+                <span>{caesarDecrypt(crackInput, shift)}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

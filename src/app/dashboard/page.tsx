@@ -67,6 +67,7 @@ export default function DashboardPage() {
     <main style={{ maxWidth: 700, margin: "40px auto", fontFamily: "sans-serif" }}>
       <h1>Dashboard</h1>
       {username && <p>Logged in as <b>{username}</b></p>}
+      <p><a href="/crypto">Go to Crypto tools &rarr;</a></p>
       {publicKey && (
         <details style={{ marginBottom: 20 }}>
           <summary>My public key (share this with others so they can message you)</summary>

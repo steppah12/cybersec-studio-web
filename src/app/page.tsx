@@ -5,7 +5,9 @@ export default function Home() {
       <p style={{ color: "#666" }}>Cryptography, PKI, steganography, watermarking, and forensics — with real user accounts and real OpenPGP-compatible messaging.</p>
       <p>
         <a href="/signup" style={{ marginRight: 16 }}>Sign Up</a>
-        <a href="/login">Log In</a>
+        <a href="/login" style={{ marginRight: 16 }}>Log In</a>
+        <a href="/crypto" style={{ marginRight: 16 }}>Crypto</a>
+        <a href="/steganography">Steganography</a>
       </p>
     </main>
   );

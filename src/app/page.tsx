@@ -7,7 +7,8 @@ export default function Home() {
         <a href="/signup" style={{ marginRight: 16 }}>Sign Up</a>
         <a href="/login" style={{ marginRight: 16 }}>Log In</a>
         <a href="/crypto" style={{ marginRight: 16 }}>Crypto</a>
-        <a href="/steganography">Steganography</a>
+        <a href="/steganography" style={{ marginRight: 16 }}>Steganography</a>
+        <a href="/watermarking">Watermarking</a>
       </p>
     </main>
   );

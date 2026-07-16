@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 interface InboxMessage {
@@ -20,6 +21,7 @@ export default function DashboardPage() {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [inbox, setInbox] = useState<InboxMessage[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     (async () => {
@@ -27,14 +29,19 @@ export default function DashboardPage() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        // Defense-in-depth: this page checks its own auth rather than solely
+        // trusting the proxy layer redirected correctly before we got here.
+        router.push("/login?redirectTo=/dashboard");
+        return;
+      }
       const { data: profile } = await supabase.from("profiles").select("username, public_key_armored").eq("id", user.id).single();
       if (profile) {
         setUsername(profile.username);
         setPublicKey(profile.public_key_armored);
       }
     })();
-  }, []);
+  }, [router]);
 
   async function handleSend() {
     setStatus("Encrypting + sending...");

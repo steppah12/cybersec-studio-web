@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -22,7 +23,8 @@ export default function LoginPage() {
       setError(error.message);
       return;
     }
-    router.push("/dashboard");
+    const redirectTo = searchParams.get("redirectTo");
+    router.push(redirectTo && redirectTo.startsWith("/") ? redirectTo : "/dashboard");
   }
 
   return (
@@ -58,5 +60,16 @@ export default function LoginPage() {
         No account? <a href="/signup">Sign up</a>
       </p>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  // useSearchParams requires a Suspense boundary for static prerendering —
+  // this wrapper is that boundary, with a minimal fallback since the form
+  // itself renders almost instantly once client JS loads.
+  return (
+    <Suspense fallback={<main style={{ maxWidth: 420, margin: "80px auto" }}>Loading...</main>}>
+      <LoginForm />
+    </Suspense>
   );
 }

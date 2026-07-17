@@ -357,6 +357,9 @@ export default function ForensicsPage() {
                 </div>
                 <div style={{ marginTop: 4, wordBreak: "break-all", fontFamily: "monospace" }}>{r.candidate}</div>
                 {r.note && <div style={{ color: "#999", fontSize: 12, marginTop: 4 }}>{r.note}</div>}
+                <a href={`/crypto?prefill=${encodeURIComponent(r.candidate)}`} style={{ fontSize: 12 }}>
+                  Send to Crypto &rarr;
+                </a>
               </div>
             );
           })}
@@ -368,7 +371,10 @@ export default function ForensicsPage() {
           <h3>Caesar Cipher (26 possible shifts)</h3>
           {caesarResults.slice(0, 3).map((r, i) => (
             <div key={i} style={{ background: "#f5f5f5", padding: 10, borderRadius: 6, marginBottom: 6, fontSize: 13 }}>
-              #{i + 1} {r.label} (score {r.score.toFixed(1)}): {r.candidate}
+              #{i + 1} {r.label} (score {r.score.toFixed(1)}): {r.candidate}{" "}
+              <a href={`/crypto?prefill=${encodeURIComponent(r.candidate)}`} style={{ fontSize: 12 }}>
+                Send to Crypto &rarr;
+              </a>
             </div>
           ))}
           <button onClick={() => setShowAllCaesar((v) => !v)} style={{ padding: "6px 12px", fontSize: 13 }}>
@@ -391,7 +397,10 @@ export default function ForensicsPage() {
           <h3>Affine Cipher (312 valid key combinations)</h3>
           {affineResults.slice(0, 5).map((r, i) => (
             <div key={i} style={{ background: "#f5f5f5", padding: 10, borderRadius: 6, marginBottom: 6, fontSize: 13 }}>
-              #{i + 1} {r.label} (score {r.score.toFixed(1)}): {r.candidate}
+              #{i + 1} {r.label} (score {r.score.toFixed(1)}): {r.candidate}{" "}
+              <a href={`/crypto?prefill=${encodeURIComponent(r.candidate)}`} style={{ fontSize: 12 }}>
+                Send to Crypto &rarr;
+              </a>
             </div>
           ))}
           <button onClick={() => setShowAllAffine((v) => !v)} style={{ padding: "6px 12px", fontSize: 13 }}>
@@ -414,7 +423,10 @@ export default function ForensicsPage() {
           <h3>Single-byte XOR</h3>
           {xorResults.slice(0, 5).map((r, i) => (
             <div key={i} style={{ background: "#f5f5f5", padding: 10, borderRadius: 6, marginBottom: 6, fontSize: 13, wordBreak: "break-all" }}>
-              #{i + 1} {r.label} (score {r.score.toFixed(1)}): {r.candidate}
+              #{i + 1} {r.label} (score {r.score.toFixed(1)}): {r.candidate}{" "}
+              <a href={`/crypto?prefill=${encodeURIComponent(r.candidate)}`} style={{ fontSize: 12 }}>
+                Send to Crypto &rarr;
+              </a>
             </div>
           ))}
         </div>
@@ -425,7 +437,10 @@ export default function ForensicsPage() {
           <h3>Rail Fence (2&ndash;10 rails)</h3>
           {railFenceResults.slice(0, 3).map((r, i) => (
             <div key={i} style={{ background: "#f5f5f5", padding: 10, borderRadius: 6, marginBottom: 6, fontSize: 13 }}>
-              #{i + 1} {r.label} (score {r.score.toFixed(1)}): {r.candidate}
+              #{i + 1} {r.label} (score {r.score.toFixed(1)}): {r.candidate}{" "}
+              <a href={`/crypto?prefill=${encodeURIComponent(r.candidate)}`} style={{ fontSize: 12 }}>
+                Send to Crypto &rarr;
+              </a>
             </div>
           ))}
         </div>

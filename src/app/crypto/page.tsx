@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const ALGO_INFO: Record<string, { strong: boolean; note: string }> = {
   "SHA-256": { strong: true, note: "Current standard, no known practical attacks." },
@@ -199,6 +199,18 @@ export default function CryptoPage() {
   // Diffie-Hellman
   const [dhResult, setDhResult] = useState<{ a: number; b: number; A: bigint; B: bigint; shared: bigint } | null>(null);
 
+  const [handoffNote, setHandoffNote] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const prefill = params.get("prefill");
+    if (prefill) {
+      setCipherText(prefill);
+      setCrackInput(prefill);
+      setHandoffNote("Text received from Forensics — pre-filled into Classical Ciphers and Cryptanalysis below.");
+    }
+  }, []);
+
   async function handleHash() {
     if (!hashInput) return;
     if (hashAlgo === "MD5") {
@@ -294,6 +306,9 @@ export default function CryptoPage() {
     <main style={{ maxWidth: 700, margin: "40px auto", fontFamily: "sans-serif", paddingBottom: 60 }}>
       <a href="/dashboard">&larr; Back to Dashboard</a>
       <h1>Crypto</h1>
+      {handoffNote && (
+        <p style={{ background: "#e8f5e9", padding: 10, borderRadius: 6, fontSize: 13, color: "#2e7d32" }}>{handoffNote}</p>
+      )}
 
       <h2>Hashing</h2>
       <label style={{ display: "block", marginBottom: 8 }}>

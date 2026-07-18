@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
         from: sender.username,
         createdAt: msg.created_at,
         plaintext: result.plaintext,
+        file: result.file,
         signatureValid: result.signatureValid,
       });
     } catch (e) {

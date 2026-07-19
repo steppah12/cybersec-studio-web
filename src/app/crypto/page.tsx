@@ -303,135 +303,149 @@ export default function CryptoPage() {
   }
 
   return (
-    <main style={{ maxWidth: 700, margin: "40px auto", fontFamily: "sans-serif", paddingBottom: 60 }}>
-      <a href="/dashboard">&larr; Back to Dashboard</a>
+    <main className="page" style={{ paddingTop: 40 }}>
+      <a href="/">&larr; Back</a>
       <h1>Crypto</h1>
       {handoffNote && (
-        <p style={{ background: "#e8f5e9", padding: 10, borderRadius: 6, fontSize: 13, color: "#2e7d32" }}>{handoffNote}</p>
+        <div className="readout tone-success" style={{ marginBottom: 16 }}>
+          <div className="readout-value" style={{ color: "var(--success)" }}>{handoffNote}</div>
+        </div>
       )}
 
       <h2>Hashing</h2>
-      <label style={{ display: "block", marginBottom: 8 }}>
-        Algorithm
-        <select value={hashAlgo} onChange={(e) => setHashAlgo(e.target.value)} style={{ display: "block", padding: 8, width: "100%" }}>
-          <option value="SHA-256">SHA-256</option>
-          <option value="SHA-384">SHA-384</option>
-          <option value="SHA-512">SHA-512</option>
-          <option value="SHA-1">SHA-1 (weak)</option>
-          <option value="MD5">MD5 (broken)</option>
-        </select>
-      </label>
-      <label style={{ display: "block", marginBottom: 8 }}>
-        Input text
-        <textarea value={hashInput} onChange={(e) => setHashInput(e.target.value)} rows={2} style={{ display: "block", width: "100%", padding: 8 }} />
-      </label>
-      <button onClick={handleHash} style={{ padding: "8px 16px" }}>
-        Compute Hash
-      </button>
-      {!ALGO_INFO[hashAlgo].strong && (
-        <p style={{ color: "crimson", fontSize: 13 }}>&#9888; {hashAlgo} is weak: {ALGO_INFO[hashAlgo].note}</p>
-      )}
-      {digest && (
-        <div style={{ background: "#f5f5f5", padding: 12, borderRadius: 6, marginTop: 8, wordBreak: "break-all", fontFamily: "monospace", fontSize: 13 }}>
-          {digest}
-        </div>
-      )}
-
-      <h2 style={{ marginTop: 32 }}>Classical Ciphers</h2>
-      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-        {(["caesar", "vigenere", "xor", "railfence"] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => {
-              setCipherType(t);
-              setCipherResult(null);
-            }}
-            style={{ padding: "6px 12px", background: cipherType === t ? "#333" : "#eee", color: cipherType === t ? "#fff" : "#000" }}
-          >
-            {t === "railfence" ? "Rail Fence" : t.charAt(0).toUpperCase() + t.slice(1)}
-          </button>
-        ))}
-      </div>
-      <label style={{ display: "block", marginBottom: 8 }}>
-        Text
-        <textarea value={cipherText} onChange={(e) => setCipherText(e.target.value)} rows={2} style={{ display: "block", width: "100%", padding: 8 }} />
-      </label>
-      <label style={{ display: "block", marginBottom: 8 }}>
-        {cipherType === "caesar" ? "Shift (0-25)" : cipherType === "railfence" ? "Number of rails" : "Key"}
-        <input value={cipherKey} onChange={(e) => setCipherKey(e.target.value)} style={{ display: "block", width: "100%", padding: 8 }} />
-      </label>
-      <div style={{ display: "flex", gap: 8 }}>
-        <button onClick={handleCipherEncrypt} style={{ padding: "8px 16px" }}>
-          Encrypt
+      <div className="card">
+        <label className="field">
+          <span>Algorithm</span>
+          <select value={hashAlgo} onChange={(e) => setHashAlgo(e.target.value)}>
+            <option value="SHA-256">SHA-256</option>
+            <option value="SHA-384">SHA-384</option>
+            <option value="SHA-512">SHA-512</option>
+            <option value="SHA-1">SHA-1 (weak)</option>
+            <option value="MD5">MD5 (broken)</option>
+          </select>
+        </label>
+        <label className="field">
+          <span>Input text</span>
+          <textarea value={hashInput} onChange={(e) => setHashInput(e.target.value)} rows={2} />
+        </label>
+        <button onClick={handleHash} className="btn-primary">
+          Compute hash
         </button>
-        <button onClick={handleCipherDecrypt} style={{ padding: "8px 16px" }}>
-          Decrypt
-        </button>
-      </div>
-      {cipherResult && (
-        <>
-          <p style={{ fontSize: 12, color: "#666", marginTop: 8, marginBottom: 4 }}>
-            Result (also copied into the Text field above — click Decrypt now to round-trip it back):
-          </p>
-          <div style={{ background: "#f5f5f5", padding: 12, borderRadius: 6, wordBreak: "break-all", fontFamily: "monospace", fontSize: 13 }}>
-            {cipherResult}
+        {!ALGO_INFO[hashAlgo].strong && (
+          <div className="note note-warm" style={{ borderLeftColor: "var(--error)" }}>
+            &#9888; {hashAlgo} is weak: {ALGO_INFO[hashAlgo].note}
           </div>
-        </>
-      )}
+        )}
+        {digest && (
+          <div className="readout">
+            <div className="readout-label"><span className="readout-dot" />Digest</div>
+            <div className="readout-value">{digest}</div>
+          </div>
+        )}
+      </div>
 
-      <h2 style={{ marginTop: 32 }}>Cryptanalysis &mdash; Frequency Analysis</h2>
-      <p style={{ fontSize: 13, color: "#666" }}>Paste Caesar-ciphertext (no key needed) &mdash; cracks it via letter-frequency scoring.</p>
-      <textarea value={crackInput} onChange={(e) => setCrackInput(e.target.value)} rows={2} style={{ display: "block", width: "100%", padding: 8, marginBottom: 8 }} />
-      <button onClick={handleCrack} style={{ padding: "8px 16px" }}>
-        Crack (Top 3 by Frequency Analysis)
-      </button>
-      <button onClick={() => setShowAllShifts((v) => !v)} style={{ padding: "8px 16px", marginLeft: 8 }}>
-        {showAllShifts ? "Hide All 26 Shifts" : "Show All 26 Shifts (Brute Force)"}
-      </button>
-      {crackResults && (
-        <div style={{ marginTop: 8 }}>
-          {crackInput.replace(/[^a-zA-Z]/g, "").length < 40 && (
-            <p style={{ color: "#b08900", fontSize: 13 }}>
-              &#9888; Only {crackInput.replace(/[^a-zA-Z]/g, "").length} letters &mdash; frequency analysis is unreliable this short. Check all 3 candidates below.
-            </p>
-          )}
-          {crackResults.map((r, i) => (
-            <div key={i} style={{ background: "#f5f5f5", padding: 10, borderRadius: 6, marginBottom: 6, fontSize: 13 }}>
-              #{i + 1} shift {r.shift} (chi-sq {r.chiSq.toFixed(2)}): {r.plaintext}
-            </div>
+      <h2>Classical Ciphers</h2>
+      <div className="card">
+        <div className="btn-row">
+          {(["caesar", "vigenere", "xor", "railfence"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => {
+                setCipherType(t);
+                setCipherResult(null);
+              }}
+              className={`btn-toggle${cipherType === t ? " active" : ""}`}
+            >
+              {t === "railfence" ? "Rail Fence" : t.charAt(0).toUpperCase() + t.slice(1)}
+            </button>
           ))}
         </div>
-      )}
-      {showAllShifts && crackInput && (
-        <div style={{ marginTop: 12 }}>
-          <p style={{ fontSize: 12, color: "#666" }}>
-            Every possible shift, no scoring or guessing &mdash; with only 26 possibilities, brute force alone is a
-            complete attack. Just read down the list for whichever line looks like real text.
-          </p>
-          <div style={{ maxHeight: 400, overflowY: "auto", border: "1px solid #ddd", borderRadius: 6 }}>
-            {Array.from({ length: 26 }, (_, shift) => (
-              <div key={shift} style={{ display: "flex", gap: 8, padding: "6px 10px", borderBottom: "1px solid #eee", fontSize: 13, fontFamily: "monospace" }}>
-                <span style={{ color: "#999", minWidth: 28 }}>{shift}</span>
-                <span>{caesarDecrypt(crackInput, shift)}</span>
+        <label className="field">
+          <span>Text</span>
+          <textarea value={cipherText} onChange={(e) => setCipherText(e.target.value)} rows={2} />
+        </label>
+        <label className="field">
+          <span>{cipherType === "caesar" ? "Shift (0-25)" : cipherType === "railfence" ? "Number of rails" : "Key"}</span>
+          <input value={cipherKey} onChange={(e) => setCipherKey(e.target.value)} />
+        </label>
+        <div className="btn-row">
+          <button onClick={handleCipherEncrypt} className="btn-primary">
+            Encrypt
+          </button>
+          <button onClick={handleCipherDecrypt} className="btn-secondary">
+            Decrypt
+          </button>
+        </div>
+        {cipherResult && (
+          <div className="readout">
+            <div className="readout-label"><span className="readout-dot" />Result &mdash; also copied into the Text field above, click Decrypt to round-trip it back</div>
+            <div className="readout-value">{cipherResult}</div>
+          </div>
+        )}
+      </div>
+
+      <h2>Cryptanalysis &mdash; Frequency Analysis</h2>
+      <div className="card">
+        <p className="section-intro" style={{ marginBottom: 12 }}>Paste Caesar-ciphertext (no key needed) &mdash; cracks it via letter-frequency scoring.</p>
+        <textarea value={crackInput} onChange={(e) => setCrackInput(e.target.value)} rows={2} style={{ marginBottom: 10 }} />
+        <div className="btn-row">
+          <button onClick={handleCrack} className="btn-primary">
+            Crack (top 3 by frequency analysis)
+          </button>
+          <button onClick={() => setShowAllShifts((v) => !v)} className="btn-secondary">
+            {showAllShifts ? "Hide all 26 shifts" : "Show all 26 shifts (brute force)"}
+          </button>
+        </div>
+        {crackResults && (
+          <>
+            {crackInput.replace(/[^a-zA-Z]/g, "").length < 40 && (
+              <div className="note note-warm">
+                &#9888; Only {crackInput.replace(/[^a-zA-Z]/g, "").length} letters &mdash; frequency analysis is unreliable this short. Check all 3 candidates below.
+              </div>
+            )}
+            {crackResults.map((r, i) => (
+              <div key={i} className="readout">
+                <div className="readout-label"><span className="readout-dot" />#{i + 1} &mdash; shift {r.shift} (chi-sq {r.chiSq.toFixed(2)})</div>
+                <div className="readout-value">{r.plaintext}</div>
               </div>
             ))}
+          </>
+        )}
+        {showAllShifts && crackInput && (
+          <div style={{ marginTop: 12 }}>
+            <p style={{ fontSize: 12, color: "var(--text-muted)" }}>
+              Every possible shift, no scoring or guessing &mdash; with only 26 possibilities, brute force alone is a
+              complete attack. Just read down the list for whichever line looks like real text.
+            </p>
+            <div style={{ maxHeight: 320, overflowY: "auto", border: "1px solid var(--border)", borderRadius: "var(--radius-sm)" }}>
+              {Array.from({ length: 26 }, (_, shift) => (
+                <div key={shift} className="mono" style={{ display: "flex", gap: 10, padding: "6px 12px", borderBottom: "1px solid var(--border)", fontSize: 12.5 }}>
+                  <span style={{ color: "var(--text-muted)", minWidth: 22 }}>{shift}</span>
+                  <span>{caesarDecrypt(crackInput, shift)}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      <h2 style={{ marginTop: 32 }}>Diffie-Hellman Key Exchange</h2>
-      <button onClick={handleDiffieHellman} style={{ padding: "8px 16px" }}>
-        Run Exchange
-      </button>
-      {dhResult && (
-        <div style={{ background: "#f5f5f5", padding: 12, borderRadius: 6, marginTop: 8, fontSize: 13, lineHeight: 1.8 }}>
-          <div>p=23, g=5 (public)</div>
-          <div>Alice's private: {dhResult.a} &mdash; Bob's private: {dhResult.b}</div>
-          <div>A = g^a mod p = {dhResult.A.toString()}</div>
-          <div>B = g^b mod p = {dhResult.B.toString()}</div>
-          <div style={{ fontWeight: 600, marginTop: 6 }}>Shared secret: {dhResult.shared.toString()}</div>
-        </div>
-      )}
+      <h2>Diffie-Hellman Key Exchange</h2>
+      <div className="card">
+        <button onClick={handleDiffieHellman} className="btn-primary">
+          Run exchange
+        </button>
+        {dhResult && (
+          <div className="readout" style={{ lineHeight: 1.8 }}>
+            <div className="readout-value">
+              p=23, g=5 (public)<br />
+              Alice&apos;s private: {dhResult.a} &mdash; Bob&apos;s private: {dhResult.b}<br />
+              A = g^a mod p = {dhResult.A.toString()}<br />
+              B = g^b mod p = {dhResult.B.toString()}<br />
+              <span style={{ color: "var(--success)", fontWeight: 600 }}>Shared secret: {dhResult.shared.toString()}</span>
+            </div>
+          </div>
+        )}
+      </div>
     </main>
   );
 }

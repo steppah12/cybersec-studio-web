@@ -28,35 +28,29 @@ function LoginForm() {
   }
 
   return (
-    <main style={{ maxWidth: 420, margin: "80px auto", fontFamily: "sans-serif" }}>
-      <h1>Log In</h1>
-      <form onSubmit={handleSubmit}>
-        <label style={{ display: "block", marginBottom: 12 }}>
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ display: "block", width: "100%", padding: 8, marginTop: 4 }}
-          />
-        </label>
-        <label style={{ display: "block", marginBottom: 12 }}>
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ display: "block", width: "100%", padding: 8, marginTop: 4 }}
-          />
-        </label>
-        {error && <p style={{ color: "crimson" }}>{error}</p>}
-        <button type="submit" disabled={busy} style={{ padding: "10px 20px" }}>
-          {busy ? "Logging in..." : "Log In"}
-        </button>
-      </form>
-      <p style={{ fontSize: 14, marginTop: 16 }}>
+    <main className="page page-narrow" style={{ paddingTop: 60 }}>
+      <h1>Log in</h1>
+      <div className="card">
+        <form onSubmit={handleSubmit}>
+          <label className="field">
+            <span>Email</span>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          </label>
+          <label className="field">
+            <span>Password</span>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          </label>
+          {error && (
+            <div className="readout tone-error" style={{ marginBottom: 14 }}>
+              <div className="readout-value" style={{ color: "var(--error)" }}>{error}</div>
+            </div>
+          )}
+          <button type="submit" disabled={busy} className="btn-primary" style={{ width: "100%" }}>
+            {busy ? "Logging in..." : "Log in"}
+          </button>
+        </form>
+      </div>
+      <p style={{ fontSize: 13.5, textAlign: "center" }}>
         No account? <a href="/signup">Sign up</a>
       </p>
     </main>
@@ -64,11 +58,8 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
-  // useSearchParams requires a Suspense boundary for static prerendering —
-  // this wrapper is that boundary, with a minimal fallback since the form
-  // itself renders almost instantly once client JS loads.
   return (
-    <Suspense fallback={<main style={{ maxWidth: 420, margin: "80px auto" }}>Loading...</main>}>
+    <Suspense fallback={<main className="page page-narrow" style={{ paddingTop: 60 }}>Loading...</main>}>
       <LoginForm />
     </Suspense>
   );

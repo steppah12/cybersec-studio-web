@@ -435,16 +435,16 @@ export default function SteganographyPage() {
   }
 
   return (
-    <main style={{ maxWidth: 720, margin: "40px auto", fontFamily: "sans-serif", paddingBottom: 60 }}>
+    <main className="page" style={{ paddingTop: 40 }}>
       <a href="/">&larr; Back</a>
       <h1>Steganography</h1>
-      <p style={{ color: "#666", fontSize: 13 }}>
+      <p className="section-intro">
         Hide data using LSB (least-significant-bit) embedding in images or audio, or invisible-character tricks in
         plain text. The same Analyze button also runs blind steganalysis (no passphrase needed) to detect whether a
         file already has something hidden in it.
       </p>
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+      <div className="btn-row">
         {(["image", "audio", "text"] as const).map((t) => (
           <button
             key={t}
@@ -453,124 +453,136 @@ export default function SteganographyPage() {
               clearMessages();
               if (t === "image" && canvasRef.current) drawPlaceholderImage(canvasRef.current);
             }}
-            style={{ padding: "6px 14px", background: coverType === t ? "#333" : "#eee", color: coverType === t ? "#fff" : "#000" }}
+            className={`btn-toggle${coverType === t ? " active" : ""}`}
           >
             {t === "audio" ? "Audio (WAV)" : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
         ))}
       </div>
 
-      {coverType === "image" && (
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ display: "block", marginBottom: 8 }}>
-            Cover image (optional — a placeholder generates if you skip this)
-            <input type="file" accept="image/*" onChange={handleImageFile} style={{ display: "block", marginTop: 4 }} />
-          </label>
-          <div style={{ background: "#f5f5f5", padding: 10, borderRadius: 6, textAlign: "center" }}>
-            <canvas
-              ref={(el) => {
-                if (el && el.width === 0) drawPlaceholderImage(el);
-              }}
-              style={{ maxWidth: "100%" }}
-            />
-          </div>
-        </div>
-      )}
-
-      {coverType === "audio" && (
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ display: "block", marginBottom: 8 }}>
-            Cover audio (WAV, 16-bit PCM)
-            <input type="file" accept=".wav,audio/wav,audio/x-wav" onChange={handleAudioFile} style={{ display: "block", marginTop: 4 }} />
-          </label>
-          {audioUrl && <audio controls src={audioUrl} style={{ width: "100%" }} />}
-        </div>
-      )}
-
-      {coverType === "text" && (
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-            <button onClick={() => setTextMethod("zw")} style={{ padding: "4px 10px", background: textMethod === "zw" ? "#333" : "#eee", color: textMethod === "zw" ? "#fff" : "#000" }}>
-              Zero-Width Chars
-            </button>
-            <button
-              onClick={() => setTextMethod("whitespace")}
-              style={{ padding: "4px 10px", background: textMethod === "whitespace" ? "#333" : "#eee", color: textMethod === "whitespace" ? "#fff" : "#000" }}
-            >
-              Whitespace (line-end)
-            </button>
-          </div>
-          <label style={{ display: "block", marginBottom: 8 }}>
-            Cover text
-            <textarea value={coverText} onChange={(e) => setCoverText(e.target.value)} rows={4} style={{ display: "block", width: "100%", padding: 8 }} />
-          </label>
-          {textStegoOutput && (
-            <label style={{ display: "block" }}>
-              Stego text (contains the hidden data)
-              <textarea readOnly value={textStegoOutput} rows={4} style={{ display: "block", width: "100%", padding: 8, fontFamily: "monospace", fontSize: 12 }} />
+      <div className="card">
+        {coverType === "image" && (
+          <>
+            <label className="field">
+              <span>Cover image (optional &mdash; a placeholder generates if you skip this)</span>
+              <input type="file" accept="image/*" onChange={handleImageFile} />
             </label>
-          )}
-        </div>
-      )}
+            <div className="canvas-frame">
+              <canvas
+                ref={(el) => {
+                  if (el && el.width === 0) drawPlaceholderImage(el);
+                }}
+              />
+            </div>
+          </>
+        )}
 
-      <label style={{ display: "block", marginBottom: 8 }}>
-        Secret message
-        <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={2} style={{ display: "block", width: "100%", padding: 8 }} />
-      </label>
-      <label style={{ display: "block", marginBottom: 8, fontSize: 13 }}>
-        <input type="checkbox" checked={encrypt} onChange={(e) => setEncrypt(e.target.checked)} /> Encrypt with AES-256-GCM before hiding
-      </label>
-      {encrypt && (
-        <label style={{ display: "block", marginBottom: 8 }}>
-          Passphrase
-          <input type="password" value={passphrase} onChange={(e) => setPassphrase(e.target.value)} style={{ display: "block", width: "100%", padding: 8 }} />
+        {coverType === "audio" && (
+          <>
+            <label className="field">
+              <span>Cover audio (WAV, 16-bit PCM)</span>
+              <input type="file" accept=".wav,audio/wav,audio/x-wav" onChange={handleAudioFile} />
+            </label>
+            {audioUrl && <audio controls src={audioUrl} style={{ width: "100%" }} />}
+          </>
+        )}
+
+        {coverType === "text" && (
+          <>
+            <div className="btn-row">
+              <button onClick={() => setTextMethod("zw")} className={`btn-toggle${textMethod === "zw" ? " active" : ""}`}>
+                Zero-Width Chars
+              </button>
+              <button onClick={() => setTextMethod("whitespace")} className={`btn-toggle${textMethod === "whitespace" ? " active" : ""}`}>
+                Whitespace (line-end)
+              </button>
+            </div>
+            <label className="field">
+              <span>Cover text</span>
+              <textarea value={coverText} onChange={(e) => setCoverText(e.target.value)} rows={4} />
+            </label>
+            {textStegoOutput && (
+              <label className="field">
+                <span>Stego text (contains the hidden data)</span>
+                <textarea readOnly value={textStegoOutput} rows={4} style={{ fontSize: 12 }} />
+              </label>
+            )}
+          </>
+        )}
+
+        <label className="field">
+          <span>Secret message</span>
+          <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={2} />
         </label>
-      )}
+        <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14, fontSize: 13, color: "var(--text-secondary)" }}>
+          <input type="checkbox" checked={encrypt} onChange={(e) => setEncrypt(e.target.checked)} style={{ width: "auto" }} />
+          Encrypt with AES-256-GCM before hiding
+        </label>
+        {encrypt && (
+          <label className="field">
+            <span>Passphrase</span>
+            <input type="password" value={passphrase} onChange={(e) => setPassphrase(e.target.value)} />
+          </label>
+        )}
 
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
-        <button onClick={handleHide} style={{ padding: "8px 16px" }}>
-          Hide Message
-        </button>
-        <button onClick={handleExtract} style={{ padding: "8px 16px" }}>
-          Extract Message
-        </button>
-        <button onClick={handleDownload} style={{ padding: "8px 16px" }}>
-          Download File
-        </button>
-        <button onClick={handleAnalyze} style={{ padding: "8px 16px" }}>
-          Analyze for Hidden Data
-        </button>
+        <div className="btn-row">
+          <button onClick={handleHide} className="btn-primary">
+            Hide message
+          </button>
+          <button onClick={handleExtract} className="btn-secondary">
+            Extract message
+          </button>
+          <button onClick={handleDownload} className="btn-secondary">
+            Download file
+          </button>
+          <button onClick={handleAnalyze} className="btn-secondary">
+            Analyze for hidden data
+          </button>
+        </div>
+
+        {error && (
+          <div className="readout tone-error">
+            <div className="readout-value" style={{ color: "var(--error)" }}>{error}</div>
+          </div>
+        )}
+        {extracted && (
+          <div className="readout tone-success">
+            <div className="readout-label"><span className="readout-dot success" />Extracted message</div>
+            <div className="readout-value">{extracted}</div>
+          </div>
+        )}
+        {verdict && (
+          <div className={`readout ${verdict.suspicious ? "tone-warn" : "tone-success"}`}>
+            <div className="readout-label">
+              <span className={`readout-dot ${verdict.suspicious ? "warn" : "success"}`} />
+              {verdict.suspicious ? "Likely contains hidden data" : "No strong evidence of hidden data"}
+            </div>
+            <div className="readout-value" style={{ marginBottom: 8 }}>
+              Chi-square = {verdict.chiSquare.toFixed(3)}, {(verdict.proportionOnes * 100).toFixed(1)}% of sampled LSBs = 1 (sample size:{" "}
+              {verdict.sampleSize})
+            </div>
+            <canvas ref={histoCanvasRef} style={{ maxWidth: "100%", borderRadius: 4 }} />
+            <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 8, marginBottom: 0 }}>
+              Below ~3.84 means the LSB distribution is statistically indistinguishable from random &mdash; consistent
+              with embedded/encrypted data at high capacity. This is a simplified version of the classic chi-square
+              steganalysis attack: most reliable near full capacity, and can miss small partial-capacity messages.
+            </p>
+          </div>
+        )}
+        {verdictNote && (
+          <div className="readout">
+            <div className="readout-value">{verdictNote}</div>
+          </div>
+        )}
       </div>
 
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
-      {extracted && (
-        <div style={{ background: "#f5f5f5", padding: 12, borderRadius: 6, marginBottom: 12 }}>
-          <b>Extracted message:</b> {extracted}
-        </div>
-      )}
-      {verdict && (
-        <div style={{ background: verdict.suspicious ? "#fff8e1" : "#e8f5e9", padding: 12, borderRadius: 6, marginBottom: 12 }}>
-          <b>{verdict.suspicious ? "Likely contains hidden data" : "No strong evidence of hidden data"}</b>
-          <div style={{ fontSize: 13, marginTop: 6 }}>
-            Chi-square = {verdict.chiSquare.toFixed(3)}, {(verdict.proportionOnes * 100).toFixed(1)}% of sampled LSBs = 1 (sample size:{" "}
-            {verdict.sampleSize})
-          </div>
-          <canvas ref={histoCanvasRef} style={{ maxWidth: "100%", marginTop: 8 }} />
-          <p style={{ fontSize: 12, color: "#666", marginTop: 6 }}>
-            Below ~3.84 means the LSB distribution is statistically indistinguishable from random — consistent with
-            embedded/encrypted data at high capacity. This is a simplified version of the classic chi-square
-            steganalysis attack: most reliable near full capacity, and can miss small partial-capacity messages.
-          </p>
-        </div>
-      )}
-      {verdictNote && <div style={{ background: "#f5f5f5", padding: 12, borderRadius: 6, marginBottom: 12, fontSize: 13 }}>{verdictNote}</div>}
-
-      <div style={{ background: "#f5f5f5", padding: 12, borderRadius: 6, fontSize: 12, color: "#666", marginTop: 24 }}>
-        <b>Not implemented yet, and why:</b> video steganography needs a real video codec pipeline (frame extraction,
-        re-encoding without destroying hidden bits) — a browser tool can extract a single frame and treat it like an
-        image, but that isn&apos;t genuine video steganography, and re-encoding almost always destroys LSB data the
-        same way JPEG recompression destroys image LSB watermarks (see the Watermarking module). This is a planned
-        future module, not something faked with a partial implementation here.
+      <div className="note">
+        <b style={{ color: "var(--text-primary)" }}>Not implemented yet, and why:</b> video steganography needs a real
+        video codec pipeline (frame extraction, re-encoding without destroying hidden bits) &mdash; a browser tool can
+        extract a single frame and treat it like an image, but that isn&apos;t genuine video steganography, and
+        re-encoding almost always destroys LSB data the same way JPEG recompression destroys image LSB watermarks
+        (see the Watermarking module). This is a planned future module, not something faked with a partial
+        implementation here.
       </div>
     </main>
   );

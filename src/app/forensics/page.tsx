@@ -315,152 +315,176 @@ export default function ForensicsPage() {
   }
 
   return (
-    <main style={{ maxWidth: 760, margin: "40px auto", fontFamily: "sans-serif", paddingBottom: 60 }}>
+    <main className="page" style={{ paddingTop: 40, maxWidth: 860 }}>
       <a href="/">&larr; Back</a>
       <h1>Forensics</h1>
-      <p style={{ color: "#666", fontSize: 13 }}>
+      <p className="section-intro">
         Paste unknown text and this tries every common decoding/cipher method at once, ranks the results by how
         much each candidate looks like real language, and shows its work rather than silently discarding failed
         attempts.
       </p>
 
       <h2>Text Analysis</h2>
-      <textarea
-        value={textInput}
-        onChange={(e) => setTextInput(e.target.value)}
-        rows={3}
-        placeholder="Paste unknown/encoded/encrypted text here"
-        style={{ display: "block", width: "100%", padding: 8, marginBottom: 8 }}
-      />
-      <button onClick={handleAnalyzeText} style={{ padding: "8px 16px" }}>
-        Analyze
-      </button>
+      <div className="card">
+        <textarea
+          value={textInput}
+          onChange={(e) => setTextInput(e.target.value)}
+          rows={3}
+          placeholder="Paste unknown/encoded/encrypted text here"
+          style={{ marginBottom: 10 }}
+        />
+        <button onClick={handleAnalyzeText} className="btn-primary">
+          Analyze
+        </button>
 
-      {analyzed && shortTextWarning && (
-        <p style={{ color: "#b08900", fontSize: 13, marginTop: 8 }}>
-          &#9888; Only {letterCount} letters — statistical ranking (used for Caesar/Affine/XOR/Rail Fence) is
-          unreliable this short. The correct answer may not be ranked #1 — check several candidates, or use &quot;show
-          all&quot; where available.
-        </p>
-      )}
+        {analyzed && shortTextWarning && (
+          <div className="note note-warm" style={{ borderLeftColor: "var(--warm)" }}>
+            &#9888; Only {letterCount} letters &mdash; statistical ranking (used for Caesar/Affine/XOR/Rail Fence) is
+            unreliable this short. The correct answer may not be ranked #1 &mdash; check several candidates, or use
+            &quot;show all&quot; where available.
+          </div>
+        )}
+      </div>
 
       {analyzed && deterministicResults.length > 0 && (
-        <div style={{ marginTop: 16 }}>
+        <>
           <h3>Direct decodings</h3>
           {deterministicResults.map((r, i) => {
             const conf = confidenceLabel(100 - r.confidence);
             return (
-              <div key={i} style={{ background: "#f5f5f5", padding: 10, borderRadius: 6, marginBottom: 6, fontSize: 13 }}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <b>{r.method}</b>
+              <div key={i} className="readout">
+                <div className="readout-label" style={{ justifyContent: "space-between" }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                    <span className="readout-dot" />
+                    <b style={{ color: "var(--text-primary)", textTransform: "none", letterSpacing: 0 }}>{r.method}</b>
+                  </span>
                   <span style={{ color: conf.color }}>{conf.label}</span>
                 </div>
-                <div style={{ marginTop: 4, wordBreak: "break-all", fontFamily: "monospace" }}>{r.candidate}</div>
-                {r.note && <div style={{ color: "#999", fontSize: 12, marginTop: 4 }}>{r.note}</div>}
-                <a href={`/crypto?prefill=${encodeURIComponent(r.candidate)}`} style={{ fontSize: 12 }}>
+                <div className="readout-value">{r.candidate}</div>
+                {r.note && <div style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 6 }}>{r.note}</div>}
+                <a href={`/crypto?prefill=${encodeURIComponent(r.candidate)}`} style={{ fontSize: 12, display: "inline-block", marginTop: 6 }}>
                   Send to Crypto &rarr;
                 </a>
               </div>
             );
           })}
-        </div>
+        </>
       )}
 
       {analyzed && caesarResults && (
-        <div style={{ marginTop: 16 }}>
-          <h3>Caesar Cipher (26 possible shifts)</h3>
+        <>
+          <h3>Caesar cipher (26 possible shifts)</h3>
           {caesarResults.slice(0, 3).map((r, i) => (
-            <div key={i} style={{ background: "#f5f5f5", padding: 10, borderRadius: 6, marginBottom: 6, fontSize: 13 }}>
-              #{i + 1} {r.label} (score {r.score.toFixed(1)}): {r.candidate}{" "}
-              <a href={`/crypto?prefill=${encodeURIComponent(r.candidate)}`} style={{ fontSize: 12 }}>
+            <div key={i} className="readout">
+              <div className="readout-label"><span className="readout-dot" />#{i + 1} &mdash; {r.label} (score {r.score.toFixed(1)})</div>
+              <div className="readout-value">{r.candidate}</div>
+              <a href={`/crypto?prefill=${encodeURIComponent(r.candidate)}`} style={{ fontSize: 12, display: "inline-block", marginTop: 6 }}>
                 Send to Crypto &rarr;
               </a>
             </div>
           ))}
-          <button onClick={() => setShowAllCaesar((v) => !v)} style={{ padding: "6px 12px", fontSize: 13 }}>
+          <button onClick={() => setShowAllCaesar((v) => !v)} className="btn-secondary">
             {showAllCaesar ? "Hide all 26" : "Show all 26 shifts"}
           </button>
           {showAllCaesar && (
-            <div style={{ maxHeight: 300, overflowY: "auto", border: "1px solid #ddd", borderRadius: 6, marginTop: 8 }}>
+            <div style={{ maxHeight: 280, overflowY: "auto", border: "1px solid var(--border)", borderRadius: "var(--radius-sm)", marginTop: 10 }}>
               {caesarResults.map((r, i) => (
-                <div key={i} style={{ padding: "4px 10px", borderBottom: "1px solid #eee", fontSize: 12, fontFamily: "monospace" }}>
+                <div key={i} className="mono" style={{ padding: "6px 12px", borderBottom: "1px solid var(--border)", fontSize: 12.5 }}>
                   {r.label}: {r.candidate}
                 </div>
               ))}
             </div>
           )}
-        </div>
+        </>
       )}
 
       {analyzed && affineResults && (
-        <div style={{ marginTop: 16 }}>
-          <h3>Affine Cipher (312 valid key combinations)</h3>
+        <>
+          <h3>Affine cipher (312 valid key combinations)</h3>
           {affineResults.slice(0, 5).map((r, i) => (
-            <div key={i} style={{ background: "#f5f5f5", padding: 10, borderRadius: 6, marginBottom: 6, fontSize: 13 }}>
-              #{i + 1} {r.label} (score {r.score.toFixed(1)}): {r.candidate}{" "}
-              <a href={`/crypto?prefill=${encodeURIComponent(r.candidate)}`} style={{ fontSize: 12 }}>
+            <div key={i} className="readout">
+              <div className="readout-label"><span className="readout-dot" />#{i + 1} &mdash; {r.label} (score {r.score.toFixed(1)})</div>
+              <div className="readout-value">{r.candidate}</div>
+              <a href={`/crypto?prefill=${encodeURIComponent(r.candidate)}`} style={{ fontSize: 12, display: "inline-block", marginTop: 6 }}>
                 Send to Crypto &rarr;
               </a>
             </div>
           ))}
-          <button onClick={() => setShowAllAffine((v) => !v)} style={{ padding: "6px 12px", fontSize: 13 }}>
+          <button onClick={() => setShowAllAffine((v) => !v)} className="btn-secondary">
             {showAllAffine ? "Hide all 312" : "Show all 312 combinations"}
           </button>
           {showAllAffine && (
-            <div style={{ maxHeight: 300, overflowY: "auto", border: "1px solid #ddd", borderRadius: 6, marginTop: 8 }}>
+            <div style={{ maxHeight: 280, overflowY: "auto", border: "1px solid var(--border)", borderRadius: "var(--radius-sm)", marginTop: 10 }}>
               {affineResults.map((r, i) => (
-                <div key={i} style={{ padding: "4px 10px", borderBottom: "1px solid #eee", fontSize: 12, fontFamily: "monospace" }}>
+                <div key={i} className="mono" style={{ padding: "6px 12px", borderBottom: "1px solid var(--border)", fontSize: 12.5 }}>
                   {r.label}: {r.candidate}
                 </div>
               ))}
             </div>
           )}
-        </div>
+        </>
       )}
 
       {analyzed && xorResults && xorResults.length > 0 && (
-        <div style={{ marginTop: 16 }}>
+        <>
           <h3>Single-byte XOR</h3>
           {xorResults.slice(0, 5).map((r, i) => (
-            <div key={i} style={{ background: "#f5f5f5", padding: 10, borderRadius: 6, marginBottom: 6, fontSize: 13, wordBreak: "break-all" }}>
-              #{i + 1} {r.label} (score {r.score.toFixed(1)}): {r.candidate}{" "}
-              <a href={`/crypto?prefill=${encodeURIComponent(r.candidate)}`} style={{ fontSize: 12 }}>
+            <div key={i} className="readout">
+              <div className="readout-label"><span className="readout-dot" />#{i + 1} &mdash; {r.label} (score {r.score.toFixed(1)})</div>
+              <div className="readout-value">{r.candidate}</div>
+              <a href={`/crypto?prefill=${encodeURIComponent(r.candidate)}`} style={{ fontSize: 12, display: "inline-block", marginTop: 6 }}>
                 Send to Crypto &rarr;
               </a>
             </div>
           ))}
-        </div>
+        </>
       )}
 
       {analyzed && railFenceResults && (
-        <div style={{ marginTop: 16 }}>
+        <>
           <h3>Rail Fence (2&ndash;10 rails)</h3>
           {railFenceResults.slice(0, 3).map((r, i) => (
-            <div key={i} style={{ background: "#f5f5f5", padding: 10, borderRadius: 6, marginBottom: 6, fontSize: 13 }}>
-              #{i + 1} {r.label} (score {r.score.toFixed(1)}): {r.candidate}{" "}
-              <a href={`/crypto?prefill=${encodeURIComponent(r.candidate)}`} style={{ fontSize: 12 }}>
+            <div key={i} className="readout">
+              <div className="readout-label"><span className="readout-dot" />#{i + 1} &mdash; {r.label} (score {r.score.toFixed(1)})</div>
+              <div className="readout-value">{r.candidate}</div>
+              <a href={`/crypto?prefill=${encodeURIComponent(r.candidate)}`} style={{ fontSize: 12, display: "inline-block", marginTop: 6 }}>
                 Send to Crypto &rarr;
               </a>
             </div>
           ))}
-        </div>
+        </>
       )}
 
-      <h2 style={{ marginTop: 32 }}>File Analysis</h2>
-      <input type="file" onChange={handleFileUpload} style={{ display: "block", marginBottom: 8 }} />
-      {fileAnalysis && (
-        <div style={{ background: "#f5f5f5", padding: 12, borderRadius: 6, fontSize: 13 }}>
-          <div>Size: {fileAnalysis.size} bytes</div>
-          <div>Entropy: {fileAnalysis.entropy.toFixed(2)} bits/byte</div>
-          <div>Detected signature: {fileAnalysis.signature ?? "unrecognized"}</div>
-        </div>
-      )}
+      <h2>File Analysis</h2>
+      <div className="card">
+        <label className="field">
+          <span>Upload a file</span>
+          <input type="file" onChange={handleFileUpload} />
+        </label>
+        {fileAnalysis && (
+          <div className="stat-grid">
+            <div className="stat-card">
+              <div className="stat-label">Size</div>
+              <div className="stat-value">{fileAnalysis.size} B</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">Entropy</div>
+              <div className="stat-value">{fileAnalysis.entropy.toFixed(2)} bits/B</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">Signature</div>
+              <div className="stat-value" style={{ fontSize: 14 }}>{fileAnalysis.signature ?? "unrecognized"}</div>
+            </div>
+          </div>
+        )}
+      </div>
 
-      <div style={{ background: "#f5f5f5", padding: 12, borderRadius: 6, fontSize: 12, color: "#666", marginTop: 24 }}>
-        <b>Not implemented yet, and why:</b> Vigenère auto-cracking (needs Kasiski examination or index-of-coincidence
-        key-length detection, not just brute force — the keyspace is too large to search directly), and deep
-        image/audio forensics (EXIF metadata, bit-plane analysis, histogram visualization beyond the basic entropy/signature
-        check here) need dedicated parsing libraries. Planned as follow-up modules rather than approximated here.
+      <div className="note">
+        <b style={{ color: "var(--text-primary)" }}>Not implemented yet, and why:</b> Vigen&egrave;re auto-cracking
+        (needs Kasiski examination or index-of-coincidence key-length detection, not just brute force &mdash; the
+        keyspace is too large to search directly), and deep image/audio forensics (EXIF metadata, bit-plane
+        analysis, histogram visualization beyond the basic entropy/signature check here) need dedicated parsing
+        libraries. Planned as follow-up modules rather than approximated here.
       </div>
     </main>
   );

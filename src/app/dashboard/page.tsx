@@ -104,72 +104,97 @@ export default function DashboardPage() {
   }
 
   return (
-    <main style={{ maxWidth: 700, margin: "40px auto", fontFamily: "sans-serif" }}>
+    <main className="page" style={{ paddingTop: 40, maxWidth: 700 }}>
       <h1>Dashboard</h1>
-      {username && <p>Logged in as <b>{username}</b></p>}
-      <p><a href="/crypto">Go to Crypto tools &rarr;</a></p>
+      {username && (
+        <p style={{ fontSize: 13.5 }}>
+          Logged in as <b style={{ color: "var(--text-primary)" }}>{username}</b> &middot;{" "}
+          <a href="/crypto">Go to Crypto tools &rarr;</a>
+        </p>
+      )}
+
       {publicKey && (
-        <details style={{ marginBottom: 20 }}>
-          <summary>My public key (share this with others so they can message you)</summary>
-          <textarea readOnly value={publicKey} rows={6} style={{ width: "100%", fontFamily: "monospace", fontSize: 11 }} />
+        <details className="card">
+          <summary style={{ cursor: "pointer", fontSize: 13.5, fontWeight: 500 }}>
+            My public key (share this with others so they can message you)
+          </summary>
+          <textarea readOnly value={publicKey} rows={6} className="mono" style={{ fontSize: 11, marginTop: 10 }} />
         </details>
       )}
 
-      <p style={{ fontSize: 13, color: "#666" }}>
-        Your account password is asked for below only to unlock your private key in memory for that one
-        operation — it is never stored, and the unlocked key never leaves the server.
-      </p>
-      <label style={{ display: "block", marginBottom: 16 }}>
-        Your account password (needed to sign/decrypt)
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ display: "block", width: "100%", padding: 8 }} />
+      <div className="note">
+        Your account password is asked for below only to unlock your private key in memory for that one operation —
+        it is never stored, and the unlocked key never leaves the server.
+      </div>
+      <label className="field">
+        <span>Your account password (needed to sign/decrypt)</span>
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
       </label>
 
-      <h2>Send a Message or File</h2>
-      <label style={{ display: "block", marginBottom: 8 }}>
-        Recipient username
-        <input value={recipient} onChange={(e) => setRecipient(e.target.value)} style={{ display: "block", width: "100%", padding: 8 }} />
-      </label>
-      <label style={{ display: "block", marginBottom: 8 }}>
-        Message (leave blank if only sending a file)
-        <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} style={{ display: "block", width: "100%", padding: 8 }} />
-      </label>
-      <label style={{ display: "block", marginBottom: 8 }}>
-        Attach a file instead (image, document, audio, video — encrypted the same way as text)
-        <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} style={{ display: "block", marginTop: 4 }} />
-      </label>
-      {file && <p style={{ fontSize: 12, color: "#666" }}>Selected: {file.name} ({(file.size / 1024).toFixed(1)} KB)</p>}
-      <button onClick={handleSend} style={{ padding: "8px 16px" }}>Encrypt &amp; Send</button>
+      <h2>Send a message or file</h2>
+      <div className="card">
+        <label className="field">
+          <span>Recipient username</span>
+          <input value={recipient} onChange={(e) => setRecipient(e.target.value)} />
+        </label>
+        <label className="field">
+          <span>Message (leave blank if only sending a file)</span>
+          <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} />
+        </label>
+        <label className="field">
+          <span>Attach a file instead (image, document, audio, video — encrypted the same way as text)</span>
+          <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+        </label>
+        {file && <p style={{ fontSize: 12 }}>Selected: {file.name} ({(file.size / 1024).toFixed(1)} KB)</p>}
+        <button onClick={handleSend} className="btn-primary">Encrypt &amp; send</button>
+      </div>
 
-      <h2 style={{ marginTop: 32 }}>Inbox</h2>
-      <button onClick={handleLoadInbox} style={{ padding: "8px 16px", marginBottom: 12 }}>Decrypt Inbox</button>
-      {status && <p>{status}</p>}
+      <h2>Inbox</h2>
+      <button onClick={handleLoadInbox} className="btn-secondary" style={{ marginBottom: 14 }}>
+        Decrypt inbox
+      </button>
+      {status && <p style={{ fontSize: 13 }}>{status}</p>}
       {inbox.map((m) => (
-        <div key={m.id} style={{ border: "1px solid #ddd", borderRadius: 6, padding: 12, marginBottom: 8 }}>
-          <div style={{ fontSize: 12, color: "#666" }}>
-            From <b>{m.from}</b> &middot; {new Date(m.createdAt).toLocaleString()}
+        <div key={m.id} className="card">
+          <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 6 }}>
+            From <b style={{ color: "var(--text-secondary)" }}>{m.from}</b> &middot; {new Date(m.createdAt).toLocaleString()}
           </div>
           {m.error ? (
-            <p style={{ color: "crimson" }}>{m.error}</p>
+            <div className="readout tone-error">
+              <div className="readout-value" style={{ color: "var(--error)" }}>{m.error}</div>
+            </div>
           ) : m.file ? (
             <>
-              <p style={{ fontSize: 13, color: "#666", marginBottom: 6 }}>Sent a file: <b>{m.file.filename}</b></p>
+              <p style={{ fontSize: 13 }}>
+                Sent a file: <b style={{ color: "var(--text-primary)" }}>{m.file.filename}</b>
+              </p>
               {isImageFile(m.file.filename) && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={fileToDataUrl(m.file.filename, m.file.bytesBase64)} alt={m.file.filename} style={{ maxWidth: "100%", borderRadius: 6, marginBottom: 6 }} />
+                <img
+                  src={fileToDataUrl(m.file.filename, m.file.bytesBase64)}
+                  alt={m.file.filename}
+                  style={{ maxWidth: "100%", borderRadius: 6, marginBottom: 10, border: "1px solid var(--border)" }}
+                />
               )}
-              <a href={fileToDataUrl(m.file.filename, m.file.bytesBase64)} download={m.file.filename} style={{ display: "inline-block", padding: "6px 12px", background: "#eee", borderRadius: 4, fontSize: 13, textDecoration: "none" }}>
+              <a href={fileToDataUrl(m.file.filename, m.file.bytesBase64)} download={m.file.filename} className="btn-secondary" style={{ display: "inline-block" }}>
                 Download {m.file.filename}
               </a>
-              <p style={{ fontSize: 12, color: m.signatureValid ? "green" : "crimson", marginTop: 6 }}>
-                {m.signatureValid ? "\u2713 Signature verified" : "\u2717 Signature invalid"}
-              </p>
+              <div style={{ marginTop: 10 }}>
+                <span className={`badge ${m.signatureValid ? "badge-success" : "badge-error"}`}>
+                  {m.signatureValid ? "Signature verified" : "Signature invalid"}
+                </span>
+              </div>
             </>
           ) : (
             <>
-              <p>{m.plaintext}</p>
-              <p style={{ fontSize: 12, color: m.signatureValid ? "green" : "crimson" }}>
-                {m.signatureValid ? "\u2713 Signature verified" : "\u2717 Signature invalid"}
-              </p>
+              <div className="readout">
+                <div className="readout-value">{m.plaintext}</div>
+              </div>
+              <div style={{ marginTop: 10 }}>
+                <span className={`badge ${m.signatureValid ? "badge-success" : "badge-error"}`}>
+                  {m.signatureValid ? "Signature verified" : "Signature invalid"}
+                </span>
+              </div>
             </>
           )}
         </div>

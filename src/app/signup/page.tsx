@@ -35,51 +35,46 @@ export default function SignupPage() {
   }
 
   return (
-    <main style={{ maxWidth: 420, margin: "80px auto", fontFamily: "sans-serif" }}>
-      <h1>Create Your Account</h1>
-      <p style={{ color: "#666", fontSize: 14 }}>
+    <main className="page page-narrow" style={{ paddingTop: 60 }}>
+      <h1>Create your account</h1>
+      <p className="section-intro">
         Signing up generates your permanent public/private key pair automatically. Your private key is encrypted
         with a key derived from your password and never leaves the server in unlocked form.
       </p>
-      <form onSubmit={handleSubmit}>
-        <label style={{ display: "block", marginBottom: 12 }}>
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ display: "block", width: "100%", padding: 8, marginTop: 4 }}
-          />
-        </label>
-        <label style={{ display: "block", marginBottom: 12 }}>
-          Username (how others find you)
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            pattern="[a-zA-Z0-9_.-]{3,32}"
-            title="3-32 characters: letters, numbers, underscore, dot, or hyphen"
-            style={{ display: "block", width: "100%", padding: 8, marginTop: 4 }}
-          />
-        </label>
-        <label style={{ display: "block", marginBottom: 12 }}>
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={8}
-            style={{ display: "block", width: "100%", padding: 8, marginTop: 4 }}
-          />
-        </label>
-        {error && <p style={{ color: "crimson" }}>{error}</p>}
-        <button type="submit" disabled={busy} style={{ padding: "10px 20px" }}>
-          {busy ? "Creating account + keys..." : "Sign Up"}
-        </button>
-      </form>
+      <div className="card">
+        <form onSubmit={handleSubmit}>
+          <label className="field">
+            <span>Email</span>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          </label>
+          <label className="field">
+            <span>Username (how others find you)</span>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              pattern="[a-zA-Z0-9_.-]{3,32}"
+              title="3-32 characters: letters, numbers, underscore, dot, or hyphen"
+            />
+          </label>
+          <label className="field">
+            <span>Password</span>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
+          </label>
+          {error && (
+            <div className="readout tone-error" style={{ marginBottom: 14 }}>
+              <div className="readout-value" style={{ color: "var(--error)" }}>{error}</div>
+            </div>
+          )}
+          <button type="submit" disabled={busy} className="btn-primary" style={{ width: "100%" }}>
+            {busy ? "Creating account + keys..." : "Sign up"}
+          </button>
+        </form>
+      </div>
+      <p style={{ fontSize: 13.5, textAlign: "center" }}>
+        Already have an account? <a href="/login">Log in</a>
+      </p>
     </main>
   );
 }

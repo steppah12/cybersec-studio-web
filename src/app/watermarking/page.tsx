@@ -189,101 +189,124 @@ export default function WatermarkingPage() {
   }
 
   return (
-    <main style={{ maxWidth: 720, margin: "40px auto", fontFamily: "sans-serif", paddingBottom: 60 }}>
+    <main className="page" style={{ paddingTop: 40 }}>
       <a href="/">&larr; Back</a>
       <h1>Watermarking</h1>
-      <p style={{ color: "#666", fontSize: 13 }}>
-        Watermarking protects ownership/integrity, not secrecy — the opposite goal from steganography. Visible
-        watermarks are a plain overlay; invisible ones here are LSB-based and fragile — any edit breaks them, which
-        is useful for tamper detection but doesn&apos;t survive compression by design.
+      <p className="section-intro">
+        Watermarking protects ownership/integrity, not secrecy &mdash; the opposite goal from steganography. Visible
+        watermarks are a plain overlay; invisible ones here are LSB-based and fragile &mdash; any edit breaks them,
+        which is useful for tamper detection but doesn&apos;t survive compression by design.
       </p>
 
-      <label style={{ display: "block", marginBottom: 8 }}>
-        Image (optional — a placeholder generates if you skip this)
-        <input type="file" accept="image/*" onChange={handleFile} style={{ display: "block", marginTop: 4 }} />
-      </label>
-      <div style={{ background: "#f5f5f5", padding: 10, borderRadius: 6, textAlign: "center", marginBottom: 20 }}>
-        <canvas
-          ref={(el) => {
-            canvasRef.current = el;
-            if (el && el.width === 0) drawDefault(el);
-          }}
-          style={{ maxWidth: "100%" }}
-        />
+      <div className="card">
+        <label className="field">
+          <span>Image (optional &mdash; a placeholder generates if you skip this)</span>
+          <input type="file" accept="image/*" onChange={handleFile} />
+        </label>
+        <div className="canvas-frame" style={{ marginBottom: 0 }}>
+          <canvas
+            ref={(el) => {
+              canvasRef.current = el;
+              if (el && el.width === 0) drawDefault(el);
+            }}
+          />
+        </div>
       </div>
 
       <h2>Visible Watermark</h2>
-      <label style={{ display: "block", marginBottom: 8 }}>
-        Watermark text
-        <input value={visibleText} onChange={(e) => setVisibleText(e.target.value)} style={{ display: "block", width: "100%", padding: 8 }} />
-      </label>
-      <button onClick={handleVisibleWatermark} style={{ padding: "8px 16px" }}>
-        Apply Visible Watermark
-      </button>
-
-      <h2 style={{ marginTop: 28 }}>Invisible (Fragile) Watermark</h2>
-      <label style={{ display: "block", marginBottom: 8 }}>
-        Owner / watermark string
-        <input value={invisibleText} onChange={(e) => setInvisibleText(e.target.value)} style={{ display: "block", width: "100%", padding: 8 }} />
-      </label>
-      <div style={{ display: "flex", gap: 8 }}>
-        <button onClick={handleInvisibleWatermark} style={{ padding: "8px 16px" }}>
-          Embed Invisible Watermark
-        </button>
-        <button onClick={handleVerify} style={{ padding: "8px 16px" }}>
-          Verify Watermark
+      <div className="card">
+        <label className="field">
+          <span>Watermark text</span>
+          <input value={visibleText} onChange={(e) => setVisibleText(e.target.value)} />
+        </label>
+        <button onClick={handleVisibleWatermark} className="btn-primary">
+          Apply visible watermark
         </button>
       </div>
-      {verifyResult && (
-        <p style={{ marginTop: 8 }}>
-          {verifyResult === "NONE_FOUND" ? (
-            <span style={{ color: "crimson" }}>No valid watermark found on this image.</span>
-          ) : (
-            <>
-              <b>Watermark verified:</b> {verifyResult}
-            </>
-          )}
-        </p>
-      )}
 
-      <h2 style={{ marginTop: 28 }}>Watermark Analysis</h2>
-      <button onClick={handleAnalyze} style={{ padding: "8px 16px" }}>
-        Compare to Original (PSNR / MSE)
-      </button>
-      {analysis && (
-        <div style={{ background: "#f5f5f5", padding: 12, borderRadius: 6, marginTop: 8, fontSize: 13 }}>
-          <div>MSE: {analysis.mse.toFixed(4)}</div>
-          <div>PSNR: {analysis.psnr === Infinity ? "\u221e" : analysis.psnr.toFixed(2) + " dB"}</div>
-          <div style={{ color: "#666", marginTop: 6 }}>PSNR above ~40dB is generally imperceptible to the human eye. Below ~30dB, distortion becomes visible.</div>
+      <h2>Invisible (Fragile) Watermark</h2>
+      <div className="card">
+        <label className="field">
+          <span>Owner / watermark string</span>
+          <input value={invisibleText} onChange={(e) => setInvisibleText(e.target.value)} />
+        </label>
+        <div className="btn-row">
+          <button onClick={handleInvisibleWatermark} className="btn-primary">
+            Embed invisible watermark
+          </button>
+          <button onClick={handleVerify} className="btn-secondary">
+            Verify watermark
+          </button>
         </div>
-      )}
-
-      <h2 style={{ marginTop: 28 }}>Robustness Test</h2>
-      <p style={{ fontSize: 13, color: "#666" }}>
-        Re-encodes the current image as JPEG at reduced quality, then tries to verify the invisible watermark. LSB
-        watermarking is expected to fail this — that&apos;s the honest, correct result, and the reason production
-        watermarking uses the DCT/DWT domain instead.
-      </p>
-      <button onClick={handleRobustnessTest} disabled={robustnessRunning} style={{ padding: "8px 16px" }}>
-        {robustnessRunning ? "Running..." : "Run JPEG Recompression Test"}
-      </button>
-      {robustness && (
-        <div style={{ background: robustness.survived ? "#e8f5e9" : "#fff8e1", padding: 12, borderRadius: 6, marginTop: 8, fontSize: 13 }}>
-          <b>{robustness.survived ? "Watermark survived JPEG recompression" : "Watermark did NOT survive JPEG recompression"}</b>
-          <div style={{ marginTop: 6, color: "#666" }}>
-            {robustness.survived
-              ? `Recovered: "${robustness.recovered}"`
-              : "This is the expected, honest result: LSB embedding lives in the spatial domain, and JPEG's DCT-based lossy compression destroys exactly the low-order bits LSB relies on. Production watermarking embeds in the DCT/DWT domain instead, surviving compression by design, not by luck."}
+        {verifyResult && (
+          <div className={`readout ${verifyResult === "NONE_FOUND" ? "tone-error" : "tone-success"}`}>
+            <div className="readout-value" style={{ color: verifyResult === "NONE_FOUND" ? "var(--error)" : undefined }}>
+              {verifyResult === "NONE_FOUND" ? "No valid watermark found on this image." : `Watermark verified: ${verifyResult}`}
+            </div>
           </div>
+        )}
+      </div>
+
+      <h2>Watermark Analysis</h2>
+      <div className="card">
+        <button onClick={handleAnalyze} className="btn-primary">
+          Compare to original (PSNR / MSE)
+        </button>
+        {analysis && (
+          <div className="stat-grid">
+            <div className="stat-card">
+              <div className="stat-label">MSE</div>
+              <div className="stat-value">{analysis.mse.toFixed(4)}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">PSNR</div>
+              <div className="stat-value">{analysis.psnr === Infinity ? "\u221e" : analysis.psnr.toFixed(2) + " dB"}</div>
+            </div>
+          </div>
+        )}
+        {analysis && (
+          <p style={{ fontSize: 12.5, color: "var(--text-muted)", margin: 0 }}>
+            PSNR above ~40dB is generally imperceptible to the human eye. Below ~30dB, distortion becomes visible.
+          </p>
+        )}
+      </div>
+
+      <h2>Robustness Test</h2>
+      <div className="card">
+        <p className="section-intro" style={{ marginBottom: 14 }}>
+          Re-encodes the current image as JPEG at reduced quality, then tries to verify the invisible watermark. LSB
+          watermarking is expected to fail this &mdash; that&apos;s the honest, correct result, and the reason
+          production watermarking uses the DCT/DWT domain instead.
+        </p>
+        <button onClick={handleRobustnessTest} disabled={robustnessRunning} className="btn-primary">
+          {robustnessRunning ? "Running..." : "Run JPEG recompression test"}
+        </button>
+        {robustness && (
+          <div className={`readout ${robustness.survived ? "tone-success" : "tone-warn"}`}>
+            <div className="readout-label">
+              <span className={`readout-dot ${robustness.survived ? "success" : "warn"}`} />
+              {robustness.survived ? "Watermark survived JPEG recompression" : "Watermark did NOT survive JPEG recompression"}
+            </div>
+            <div className="readout-value">
+              {robustness.survived
+                ? `Recovered: "${robustness.recovered}"`
+                : "This is the expected, honest result: LSB embedding lives in the spatial domain, and JPEG's DCT-based lossy compression destroys exactly the low-order bits LSB relies on. Production watermarking embeds in the DCT/DWT domain instead, surviving compression by design, not by luck."}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {error && (
+        <div className="readout tone-error">
+          <div className="readout-value" style={{ color: "var(--error)" }}>{error}</div>
         </div>
       )}
 
-      {error && <p style={{ color: "crimson", marginTop: 12 }}>{error}</p>}
-
-      <div style={{ background: "#f5f5f5", padding: 12, borderRadius: 6, fontSize: 12, color: "#666", marginTop: 24 }}>
-        <b>Not implemented yet, and why:</b> robust DCT/DWT/SVD watermarking (survives compression/cropping/rotation
-        by design), SSIM/NC/BER metrics, and dedicated attack simulations (cropping, scaling, blur) need a real
-        frequency-domain transform pipeline that spatial-domain LSB can&apos;t provide — planned as a later module.
+      <div className="note">
+        <b style={{ color: "var(--text-primary)" }}>Not implemented yet, and why:</b> robust DCT/DWT/SVD watermarking
+        (survives compression/cropping/rotation by design), SSIM/NC/BER metrics, and dedicated attack simulations
+        (cropping, scaling, blur) need a real frequency-domain transform pipeline that spatial-domain LSB can&apos;t
+        provide &mdash; planned as a later module.
       </div>
     </main>
   );

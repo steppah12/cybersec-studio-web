@@ -1,26 +1,26 @@
 :root {
   /* Color */
-  --bg: #0d1017;
-  --surface: #151922;
-  --surface-raised: #1b212c;
-  --border: #2a3140;
-  --border-strong: #394257;
+  --bg: #0a0a0b;
+  --surface: #141415;
+  --surface-raised: #1c1c1e;
+  --border: #2b2b2d;
+  --border-strong: #3a3a3d;
 
-  --text-primary: #edeff3;
-  --text-secondary: #8d95a5;
-  --text-muted: #5c6577;
+  --text-primary: #f0efed;
+  --text-secondary: #9b9c9f;
+  --text-muted: #636366;
 
-  --accent: #4c8dff;
-  --accent-dim: #1f3a66;
-  --accent-hover: #6ba0ff;
+  --accent: #c1393c;
+  --accent-dim: #341c1c;
+  --accent-hover: #d65a53;
 
-  --warm: #e3a857;
-  --warm-dim: #4a3a20;
+  --warm: #d4a73b;
+  --warm-dim: #3a2f16;
 
   --success: #3fbf7f;
   --success-dim: #17301f;
-  --error: #e5636f;
-  --error-dim: #3a1a1e;
+  --error: #e2673d;
+  --error-dim: #3a2418;
 
   /* Type */
   --font-ui: "IBM Plex Sans", "Segoe UI", sans-serif;
@@ -257,7 +257,7 @@ button:disabled {
 .btn-primary,
 button.btn-primary {
   background: var(--accent);
-  color: #06111f;
+  color: #fbf1ef;
   font-weight: 600;
 }
 .btn-primary:hover:not(:disabled) {

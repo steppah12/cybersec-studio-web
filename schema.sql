@@ -60,3 +60,34 @@ create policy "Users can read messages they sent or received"
 create policy "Users can send messages as themselves"
   on messages for insert
   with check (auth.uid() = sender_id);
+
+-- Password vault: stores site credentials ENCRYPTED (reversible, AES-GCM) not
+-- hashed (irreversible) — a vault has to give the real password back to the
+-- user, which hashing can never do. The encryption key is derived from the
+-- user's account password the same way the OpenPGP identity key is (see
+-- lib/crypto/identity.ts), but with a distinct salt context (see
+-- lib/crypto/vault.ts) so the two derived keys are cryptographically
+-- unrelated even though they share the same source password.
+create table vault_entries (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references profiles(id) on delete cascade,
+  site_name text not null,
+  site_username text,
+  encrypted_password_iv text not null,
+  encrypted_password_ciphertext text not null,
+  created_at timestamptz not null default now()
+);
+
+alter table vault_entries enable row level security;
+
+create policy "Users can read only their own vault entries"
+  on vault_entries for select
+  using (auth.uid() = user_id);
+
+create policy "Users can insert only their own vault entries"
+  on vault_entries for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users can delete only their own vault entries"
+  on vault_entries for delete
+  using (auth.uid() = user_id);

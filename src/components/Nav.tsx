@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/steganography", label: "Steganography" },
   { href: "/watermarking", label: "Watermarking" },
   { href: "/forensics", label: "Forensics" },
+  { href: "/password-tools", label: "Password Tools" },
 ];
 
 export default function Nav() {

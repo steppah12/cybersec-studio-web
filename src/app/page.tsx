@@ -38,6 +38,13 @@ export default function Home() {
           <h3>Forensics</h3>
           <p>Auto-solve unknown ciphers and encodings, ranked by confidence.</p>
         </a>
+        <a href="/password-tools" className="module-card">
+          <div className="module-card-icon" style={{ background: "var(--accent-dim)", color: "var(--accent)" }}>
+            &#128273;
+          </div>
+          <h3>Password Tools</h3>
+          <p>Strength analysis, crack-time estimates, and a real brute-force demo.</p>
+        </a>
       </div>
     </main>
   );

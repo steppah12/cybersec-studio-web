@@ -109,7 +109,7 @@ export default function DashboardPage() {
       {username && (
         <p style={{ fontSize: 13.5 }}>
           Logged in as <b style={{ color: "var(--text-primary)" }}>{username}</b> &middot;{" "}
-          <a href="/crypto">Go to Crypto tools &rarr;</a>
+          <a href="/crypto">Go to Crypto tools &rarr;</a> &middot; <a href="/vault">Password Vault &rarr;</a>
         </p>
       )}
 

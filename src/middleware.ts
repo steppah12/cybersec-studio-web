@@ -7,7 +7,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * is a public tool and never touches auth at all — per the project's core
  * philosophy: only gate what genuinely needs identity.
  */
-const PROTECTED_PREFIXES = ["/dashboard", "/messages", "/contacts", "/settings", "/api/messages"];
+const PROTECTED_PREFIXES = ["/dashboard", "/messages", "/contacts", "/settings", "/vault", "/api/messages", "/api/vault"];
 
 function isProtected(pathname: string): boolean {
   return PROTECTED_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(prefix + "/"));

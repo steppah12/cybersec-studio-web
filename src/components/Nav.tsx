@@ -54,6 +54,9 @@ export default function Nav() {
         <div className="nav-auth">
           {!checked ? null : username ? (
             <>
+              <a href="/vault" className="nav-link">
+                Vault
+              </a>
               <a href="/dashboard" className="nav-link">
                 {username}
               </a>
